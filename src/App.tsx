@@ -1,34 +1,59 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useForm } from "react-hook-form"
+import { FormType, schema } from "./validator"
+import { zodResolver } from "@hookform/resolvers/zod"
 
-function App() {
-  const [count, setCount] = useState(0)
+const radioOptions = [
+  { label: "男", value: "male" },
+  { label: "女", value: "female" },
+  { label: "その他", value: "neither" },
+]
+
+const App = () => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormType>({
+    defaultValues: {
+      name: "",
+      gender: "",
+      email: "",
+    },
+    resolver: zodResolver(schema),
+  })
+
+  const onSubmit = (data: FormType) => console.log(data)
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="w-screen h-screen">
+      <div className="flex flex-col justify-center items-center">
+        <form onSubmit={handleSubmit(onSubmit)} className="">
+          <p>名前</p>
+          <input {...register("name")} />
+          {errors.name?.message && <p className="text-red-500">{errors.name?.message}</p>}
+
+          <p>性別</p>
+          <div className="flex flex-row">
+            {radioOptions.map((option) => {
+              const { label, value } = option
+              return (
+                <label key={value}>
+                  <input type="radio" value={value} {...register("gender")} />
+                  {label}
+                </label>
+              )
+            })}
+          </div>
+          {errors.gender?.message && <p className="text-red-500">{errors.gender?.message}</p>}
+
+          <p>メールアドレス</p>
+          <input {...register("email")} />
+          {errors.email?.message && <p className="text-red-500">{errors.email?.message}</p>}
+
+          <button type="submit">submit!</button>
+        </form>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
