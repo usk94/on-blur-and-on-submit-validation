@@ -19,6 +19,7 @@ const App = () => {
       gender: "",
       email: "",
     },
+    mode: "onBlur",
     resolver: zodResolver(schema),
   })
 
