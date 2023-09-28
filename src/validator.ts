@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-type PaymentMethod = "card" | "bank" | "paypal" | "cache"
+type ConviniName = "familyMart" | "sevenEleven" | "lawson"
 
 const isValidCreditCardNumber = (cardNumber: string) => {
   const number = cardNumber.replace(/\s+/g, "")
@@ -26,16 +26,44 @@ const isValidCreditCardNumber = (cardNumber: string) => {
   return total % 10 === 0
 }
 
-const isValidCVC = (cvc: string) => {
-  const pattern = /^\d{3,4}$/
-  return pattern.test(cvc)
+const isValidCvc = (cvc: string) => {
+  return /^\d{3,4}$/.test(cvc)
 }
 
-export const schema = z.object({
+const cardSchema = z.object({
+  number: z.string().refine(isValidCreditCardNumber, { message: "カード番号が正しくありません" }),
   name: z.string().min(1, { message: "名前を入力してください" }),
-  gender: z.string().min(1, { message: "選択してください" }),
-  email: z.string().email({ message: "不正なメールアドレスです" }),
-  paymentMethod: z.custom<PaymentMethod>(),
+  expiryMonth: z.string(),
+  expiryYear: z.string(),
+  cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
 })
 
+const paypalSchema = z.object({
+  email: z.string().email({ message: "メールアドレスが正しくありません" }),
+})
+
+const conviniSchema = z.object({
+  conviniName: z.custom<ConviniName>(),
+})
+
+export const schema = z.union([
+  z.object({
+    paymentMethod: z.literal("card"),
+    card: cardSchema,
+    paypal: paypalSchema.optional(),
+    convini: conviniSchema.optional(),
+  }),
+  z.object({
+    paymentMethod: z.literal("paypal"),
+    paypal: paypalSchema,
+    card: cardSchema.optional(),
+    convini: conviniSchema.optional(),
+  }),
+  z.object({
+    paymentMethod: z.literal("convini"),
+    convini: conviniSchema,
+    card: cardSchema.optional(),
+    paypal: paypalSchema.optional(),
+  }),
+])
 export type FormType = z.infer<typeof schema>
