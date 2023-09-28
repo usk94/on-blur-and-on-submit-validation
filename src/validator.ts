@@ -30,40 +30,54 @@ const isValidCvc = (cvc: string) => {
   return /^\d{3,4}$/.test(cvc)
 }
 
-const cardSchema = z.object({
-  number: z.string().refine(isValidCreditCardNumber, { message: "カード番号が正しくありません" }),
-  name: z.string().min(1, { message: "名前を入力してください" }),
-  expiryMonth: z.string(),
-  expiryYear: z.string(),
-  cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
-})
-
-const paypalSchema = z.object({
-  email: z.string().email({ message: "メールアドレスが正しくありません" }),
-})
-
-const conviniSchema = z.object({
-  conviniName: z.custom<ConviniName>(),
-})
-
-export const schema = z.union([
+export const schema = z.discriminatedUnion("paymentMethod", [
   z.object({
     paymentMethod: z.literal("card"),
-    card: cardSchema,
-    paypal: paypalSchema.optional(),
-    convini: conviniSchema.optional(),
+    card: z.object({
+      number: z.string().refine(isValidCreditCardNumber, { message: "カード番号が正しくありません" }),
+      name: z.string().min(1, { message: "名前を入力してください" }),
+      expiryMonth: z.string(),
+      expiryYear: z.string(),
+      cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
+    }),
+    paypal: z.object({
+      email: z.string().nullable(),
+    }),
+    convini: z.object({
+      conviniName: z.custom<ConviniName>().nullable(),
+    }),
   }),
   z.object({
     paymentMethod: z.literal("paypal"),
-    paypal: paypalSchema,
-    card: cardSchema.optional(),
-    convini: conviniSchema.optional(),
+    paypal: z.object({
+      email: z.string().email({ message: "メールアドレスが正しくありません" }),
+    }),
+    card: z.object({
+      number: z.string().nullable(),
+      name: z.string().nullable(),
+      expiryMonth: z.string().nullable(),
+      expiryYear: z.string().nullable(),
+      cvc: z.string().nullable(),
+    }),
+    convini: z.object({
+      conviniName: z.custom<ConviniName>().nullable(),
+    }),
   }),
   z.object({
     paymentMethod: z.literal("convini"),
-    convini: conviniSchema,
-    card: cardSchema.optional(),
-    paypal: paypalSchema.optional(),
+    convini: z.object({
+      conviniName: z.custom<ConviniName>(),
+    }),
+    card: z.object({
+      number: z.string().nullable(),
+      name: z.string().nullable(),
+      expiryMonth: z.string().nullable(),
+      expiryYear: z.string().nullable(),
+      cvc: z.string().nullable(),
+    }),
+    paypal: z.object({
+      email: z.string().nullable(),
+    }),
   }),
 ])
 export type FormType = z.infer<typeof schema>
