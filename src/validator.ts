@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+export type PaymentMethodType = "card" | "paypal" | "convini"
+
 type ConviniName = "familyMart" | "sevenEleven" | "lawson"
 
 const isValidCreditCardNumber = (cardNumber: string) => {
@@ -30,9 +32,9 @@ const isValidCvc = (cvc: string) => {
   return /^\d{3,4}$/.test(cvc)
 }
 
-export const schema = z.discriminatedUnion("paymentMethod", [
+export const schema = z.discriminatedUnion("selectedPaymentMethod", [
   z.object({
-    paymentMethod: z.literal("card"),
+    selectedPaymentMethod: z.literal("card"),
     card: z.object({
       number: z.string().refine(isValidCreditCardNumber, { message: "カード番号が正しくありません" }),
       name: z.string().min(1, { message: "名前を入力してください" }),
@@ -48,7 +50,7 @@ export const schema = z.discriminatedUnion("paymentMethod", [
     }),
   }),
   z.object({
-    paymentMethod: z.literal("paypal"),
+    selectedPaymentMethod: z.literal("paypal"),
     paypal: z.object({
       email: z.string().email({ message: "メールアドレスが正しくありません" }),
     }),
@@ -64,7 +66,7 @@ export const schema = z.discriminatedUnion("paymentMethod", [
     }),
   }),
   z.object({
-    paymentMethod: z.literal("convini"),
+    selectedPaymentMethod: z.literal("convini"),
     convini: z.object({
       conviniName: z.custom<ConviniName>(),
     }),
