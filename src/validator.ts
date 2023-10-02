@@ -43,6 +43,7 @@ export const schema = z.discriminatedUnion("selectedPaymentMethod", [
       cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
     }),
     paypal: z.object({
+      // optionalにする？
       email: z.string().nullable(),
     }),
     convini: z.object({
