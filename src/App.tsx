@@ -44,16 +44,33 @@ const App = () => {
           switch (method) {
             case "card":
               return (
-                <label className="flex w-full rounded-lg border py-4 px-4 border-gray-200">
-                  <input type="radio" value="card" {...register("selectedPaymentMethod")} />
-                  <div className="flex items-center gap-x-3">
-                    <div className="text-left">
-                      <p className="ml-1 text-sm font-semibold text-black">カード</p>
+                <label className="flex flex-col w-full rounded-lg border py-4 px-4 border-gray-200">
+                  <div className="flex">
+                    <input type="radio" value="card" {...register("selectedPaymentMethod")} />
+                    <div className="flex items-center gap-x-3">
+                      <div className="text-left">
+                        <p className="ml-2 text-sm font-semibold text-black">カード</p>
+                      </div>
                     </div>
                   </div>
                   {isActive(method) && (
-                    <div>
-                      <input {...register("card.number")} className="border border-gray-300 rounded ml-2" />
+                    <div className="flex flex-col">
+                      <div className="flex mt-4 items-center">
+                        <p className="text-sm">カード番号</p>
+                        <input {...register("card.number")} className="border border-gray-300 rounded ml-2" />
+                      </div>
+                      <div className="flex mt-4 items-center">
+                        <p className="text-sm">氏名</p>
+                        <input {...register("card.name")} className="border border-gray-300 rounded ml-2" />
+                      </div>
+                      <div className="flex mt-4 items-center">
+                        <p className="text-sm">有効期限</p>
+                        <input {...register("card.number")} className="border border-gray-300 rounded ml-2" />
+                      </div>
+                      <div className="flex mt-4 items-center">
+                        <p className="text-sm">セキュリティコード</p>
+                        <input {...register("card.cvc")} className="border border-gray-300 rounded ml-2" />
+                      </div>
                     </div>
                   )}
                 </label>
@@ -65,12 +82,12 @@ const App = () => {
                     <input type="radio" value="paypal" {...register("selectedPaymentMethod")} />
                     <div className="flex items-center gap-x-3">
                       <div className="text-left">
-                        <p className="ml-1 text-sm font-semibold text-black">paypal</p>
+                        <p className="ml-2 text-sm font-semibold text-black">paypal</p>
                       </div>
                     </div>
                   </div>
                   {isActive(method) && (
-                    <div className="flex mt-4 justify-center items-center">
+                    <div className="flex mt-4 items-center">
                       <p className="text-sm">メールアドレス</p>
                       <input {...register("paypal.email")} className="border border-gray-300 rounded ml-2" />
                     </div>
