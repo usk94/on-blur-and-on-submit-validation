@@ -32,6 +32,18 @@ const isValidCvc = (cvc: string) => {
   return /^\d{3,4}$/.test(cvc)
 }
 
+const skipCardSchema = z.object({
+  number: z.string().optional(),
+  name: z.string().optional(),
+  expiryMonth: z.string().optional(),
+  expiryYear: z.string().optional(),
+  cvc: z.string().optional(),
+})
+
+const skipConviniSchema = z.object({
+  conviniName: z.custom<ConviniName>().optional(),
+})
+
 export const schema = z.discriminatedUnion("selectedPaymentMethod", [
   z.object({
     selectedPaymentMethod: z.literal("card"),
@@ -42,35 +54,19 @@ export const schema = z.discriminatedUnion("selectedPaymentMethod", [
       expiryYear: z.string(),
       cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
     }),
-    convini: z.object({
-      conviniName: z.custom<ConviniName>().optional(),
-    }),
+    convini: skipConviniSchema,
   }),
   z.object({
     selectedPaymentMethod: z.literal("convini"),
     convini: z.object({
       conviniName: z.custom<ConviniName>(),
     }),
-    card: z.object({
-      number: z.string().optional(),
-      name: z.string().optional(),
-      expiryMonth: z.string().optional(),
-      expiryYear: z.string().optional(),
-      cvc: z.string().optional(),
-    }),
+    card: skipCardSchema,
   }),
   z.object({
     selectedPaymentMethod: z.literal("bank"),
-    card: z.object({
-      number: z.string().optional(),
-      name: z.string().optional(),
-      expiryMonth: z.string().optional(),
-      expiryYear: z.string().optional(),
-      cvc: z.string().optional(),
-    }),
-    convini: z.object({
-      conviniName: z.custom<ConviniName>().optional(),
-    }),
+    card: skipCardSchema,
+    convini: skipConviniSchema,
   }),
 ])
 export type FormType = z.infer<typeof schema>
