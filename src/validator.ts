@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export type PaymentMethodType = "card" | "paypal" | "convini"
+export type PaymentMethodType = "card" | "bank" | "convini"
 
 type ConviniName = "familyMart" | "sevenEleven" | "lawson"
 
@@ -42,28 +42,8 @@ export const schema = z.discriminatedUnion("selectedPaymentMethod", [
       expiryYear: z.string(),
       cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
     }),
-    paypal: z.object({
-      // optionalにする？
-      email: z.string().nullable(),
-    }),
     convini: z.object({
-      conviniName: z.custom<ConviniName>().nullable(),
-    }),
-  }),
-  z.object({
-    selectedPaymentMethod: z.literal("paypal"),
-    paypal: z.object({
-      email: z.string().email({ message: "メールアドレスが正しくありません" }),
-    }),
-    card: z.object({
-      number: z.string().nullable(),
-      name: z.string().nullable(),
-      expiryMonth: z.string().nullable(),
-      expiryYear: z.string().nullable(),
-      cvc: z.string().nullable(),
-    }),
-    convini: z.object({
-      conviniName: z.custom<ConviniName>().nullable(),
+      conviniName: z.custom<ConviniName>().optional(),
     }),
   }),
   z.object({
@@ -72,14 +52,24 @@ export const schema = z.discriminatedUnion("selectedPaymentMethod", [
       conviniName: z.custom<ConviniName>(),
     }),
     card: z.object({
-      number: z.string().nullable(),
-      name: z.string().nullable(),
-      expiryMonth: z.string().nullable(),
-      expiryYear: z.string().nullable(),
-      cvc: z.string().nullable(),
+      number: z.string().optional(),
+      name: z.string().optional(),
+      expiryMonth: z.string().optional(),
+      expiryYear: z.string().optional(),
+      cvc: z.string().optional(),
     }),
-    paypal: z.object({
-      email: z.string().nullable(),
+  }),
+  z.object({
+    selectedPaymentMethod: z.literal("bank"),
+    card: z.object({
+      number: z.string().optional(),
+      name: z.string().optional(),
+      expiryMonth: z.string().optional(),
+      expiryYear: z.string().optional(),
+      cvc: z.string().optional(),
+    }),
+    convini: z.object({
+      conviniName: z.custom<ConviniName>().optional(),
     }),
   }),
 ])
