@@ -2,7 +2,7 @@ import { useForm, useWatch } from "react-hook-form"
 import { FormType, PaymentMethodType, schema } from "./validator"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-const paymentMethods = ["card", "paypal", "convini"] as const
+const paymentMethods = ["card", "convini", "bank"] as const
 
 const App = () => {
   const {
@@ -18,12 +18,10 @@ const App = () => {
         name: "",
         expiryYear: "",
         expiryMonth: "",
-      },
-      paypal: {
-        email: "",
+        cvc: "",
       },
       convini: {
-        conviniName: null,
+        conviniName: undefined,
       },
     },
     mode: "onBlur",
@@ -54,7 +52,7 @@ const App = () => {
                     </div>
                   </div>
                   {isActive(method) && (
-                    <div className="flex flex-col">
+                    <div className="flex flex-col items-stretch">
                       <div className="flex mt-4 items-center">
                         <p className="text-sm">カード番号</p>
                         <input {...register("card.number")} className="border border-gray-300 rounded ml-2" />
@@ -65,7 +63,14 @@ const App = () => {
                       </div>
                       <div className="flex mt-4 items-center">
                         <p className="text-sm">有効期限</p>
-                        <input {...register("card.number")} className="border border-gray-300 rounded ml-2" />
+                        <select
+                          {...register("card.expiryYear")}
+                          className="w-1/2 border border-gray-300 rounded ml-2"
+                        />
+                        <select
+                          {...register("card.expiryMonth")}
+                          className="w-1/2 border border-gray-300 rounded ml-2"
+                        />
                       </div>
                       <div className="flex mt-4 items-center">
                         <p className="text-sm">セキュリティコード</p>
@@ -75,26 +80,41 @@ const App = () => {
                   )}
                 </label>
               )
-            case "paypal":
+            case "convini":
               return (
                 <label className="flex flex-col border-gray-200 w-full rounded-lg border py-4 px-4">
                   <div className="flex">
-                    <input type="radio" value="paypal" {...register("selectedPaymentMethod")} />
+                    <input type="radio" value="convini" {...register("selectedPaymentMethod")} />
                     <div className="flex items-center gap-x-3">
                       <div className="text-left">
-                        <p className="ml-2 text-sm font-semibold text-black">paypal</p>
+                        <p className="ml-2 text-sm font-semibold text-black">コンビニ決済</p>
                       </div>
                     </div>
                   </div>
                   {isActive(method) && (
                     <div className="flex mt-4 items-center">
-                      <p className="text-sm">メールアドレス</p>
-                      <input {...register("paypal.email")} className="border border-gray-300 rounded ml-2" />
+                      <select
+                        {...register("convini.conviniName")}
+                        className="w-1/2 border border-gray-300 rounded ml-2"
+                      />
                     </div>
                   )}
-                  {isActive(method) && errors?.paypal?.email?.message && (
-                    <p className="mt-2 text-red-500 text-sm">{errors?.paypal?.email?.message}</p>
+                  {isActive(method) && errors?.convini?.conviniName?.message && (
+                    <p className="mt-2 text-red-500 text-sm">{errors?.convini?.conviniName?.message}</p>
                   )}
+                </label>
+              )
+            case "bank":
+              return (
+                <label className="flex flex-col border-gray-200 w-full rounded-lg border py-4 px-4">
+                  <div className="flex">
+                    <input type="radio" value="bank" {...register("selectedPaymentMethod")} />
+                    <div className="flex items-center gap-x-3">
+                      <div className="text-left">
+                        <p className="ml-2 text-sm font-semibold text-black">銀行振込</p>
+                      </div>
+                    </div>
+                  </div>
                 </label>
               )
           }
