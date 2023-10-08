@@ -4,6 +4,23 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 const paymentMethods = ["card", "convini", "bank"] as const
 
+const covniniOptions = [
+  { value: "familyMart", label: "ファミリーマート" },
+  { value: "sevenEleven", label: "セブンイレブン" },
+  { value: "lawson", label: "ローソン" },
+]
+
+const monthOptions = [...Array(12)].map((_, index) => ({
+  value: `0${index + 1}`.slice(-2),
+  label: `0${index + 1}`.slice(-2),
+}))
+
+const currentYear = new Date().getFullYear()
+const yearOptions = [...Array(32)].map((_, index) => ({
+  value: String(currentYear + index),
+  label: String(currentYear + index),
+}))
+
 const App = () => {
   const {
     register,
@@ -37,71 +54,88 @@ const App = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col w-screen h-screen justify-center items-center">
       <p className="text-xl font-semibold">支払い方法</p>
-      <div className="mt-2 flex flex-col gap-y-4 w-80">
+      <div className="mt-2 flex flex-col gap-y-4 w-96">
         {paymentMethods.map((method) => {
           switch (method) {
             case "card":
               return (
-                <label className="flex flex-col w-full rounded-lg border py-4 px-4 border-gray-200">
-                  <div className="flex">
-                    <input type="radio" value="card" {...register("selectedPaymentMethod")} />
-                    <div className="flex items-center gap-x-3">
-                      <div className="text-left">
-                        <p className="ml-2 text-sm font-semibold text-black">カード</p>
-                      </div>
-                    </div>
+                <label className="flex w-full rounded-lg border py-4 px-4 border-gray-200 gap-y-4">
+                  <input type="radio" value="card" {...register("selectedPaymentMethod")} />
+                  <div className="ml-2">
+                    <p className="text-sm font-semibold text-black">カード</p>
+                    {isActive(method) && (
+                      <>
+                        <div className="pb-2 mt-2 border-t border-gray" />
+                        <div className="grid grid-rows-4 grid-cols-2 gap-y-2">
+                          <p className="text-sm">カード番号</p>
+                          <input {...register("card.number")} className="border border-gray-300 rounded" />
+                          <p className="text-sm">氏名</p>
+                          <input {...register("card.name")} className="border border-gray-300 rounded" />
+                          <p className="text-sm">有効期限</p>
+                          <div className="flex gap-x-2">
+                            <select
+                              {...register("card.expiryYear")}
+                              defaultValue="年"
+                              autoComplete="cc-exp-year"
+                              className="w-1/2 border border-gray-300 rounded"
+                            >
+                              <option key="default" value="">
+                                年
+                              </option>
+                              {yearOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                            <select
+                              {...register("card.expiryMonth")}
+                              defaultValue="month"
+                              autoComplete="cc-exp-month"
+                              className="w-1/2 border border-gray-300 rounded"
+                            >
+                              <option key="default" value="">
+                                月
+                              </option>
+                              {monthOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <p className="text-sm">セキュリティコード</p>
+                          <input {...register("card.cvc")} className="border border-gray-300 rounded" />
+                        </div>
+                      </>
+                    )}
                   </div>
-                  {isActive(method) && (
-                    <div className="flex flex-col items-stretch">
-                      <div className="flex mt-4 items-center">
-                        <p className="text-sm">カード番号</p>
-                        <input {...register("card.number")} className="border border-gray-300 rounded ml-2" />
-                      </div>
-                      <div className="flex mt-4 items-center">
-                        <p className="text-sm">氏名</p>
-                        <input {...register("card.name")} className="border border-gray-300 rounded ml-2" />
-                      </div>
-                      <div className="flex mt-4 items-center">
-                        <p className="text-sm">有効期限</p>
-                        <select
-                          {...register("card.expiryYear")}
-                          className="w-1/2 border border-gray-300 rounded ml-2"
-                        />
-                        <select
-                          {...register("card.expiryMonth")}
-                          className="w-1/2 border border-gray-300 rounded ml-2"
-                        />
-                      </div>
-                      <div className="flex mt-4 items-center">
-                        <p className="text-sm">セキュリティコード</p>
-                        <input {...register("card.cvc")} className="border border-gray-300 rounded ml-2" />
-                      </div>
-                    </div>
-                  )}
                 </label>
               )
             case "convini":
               return (
-                <label className="flex flex-col border-gray-200 w-full rounded-lg border py-4 px-4">
-                  <div className="flex">
-                    <input type="radio" value="convini" {...register("selectedPaymentMethod")} />
-                    <div className="flex items-center gap-x-3">
-                      <div className="text-left">
-                        <p className="ml-2 text-sm font-semibold text-black">コンビニ決済</p>
+                <label className="flex border-gray-200 w-full rounded-lg border py-4 px-4">
+                  <input type="radio" value="convini" {...register("selectedPaymentMethod")} />
+                  <div className="ml-2">
+                    <p className="text-sm font-semibold text-black">コンビニ決済</p>
+                    {isActive(method) && (
+                      <div className="flex mt-4 items-center">
+                        <select {...register("convini.conviniName")} className="border border-gray-300 rounded">
+                          <option key="default" value="">
+                            選択してください
+                          </option>
+                          {covniniOptions.map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                    </div>
+                    )}
+                    {isActive(method) && errors?.convini?.conviniName?.message && (
+                      <p className="mt-2 text-red-500 text-sm">{errors?.convini?.conviniName?.message}</p>
+                    )}
                   </div>
-                  {isActive(method) && (
-                    <div className="flex mt-4 items-center">
-                      <select
-                        {...register("convini.conviniName")}
-                        className="w-1/2 border border-gray-300 rounded ml-2"
-                      />
-                    </div>
-                  )}
-                  {isActive(method) && errors?.convini?.conviniName?.message && (
-                    <p className="mt-2 text-red-500 text-sm">{errors?.convini?.conviniName?.message}</p>
-                  )}
                 </label>
               )
             case "bank":
