@@ -4,6 +4,8 @@ export type PaymentMethodType = "card" | "bank" | "convini"
 
 type ConviniName = "familyMart" | "sevenEleven" | "lawson"
 
+export const currentYear = new Date().getFullYear()
+
 const isValidCreditCardNumber = (cardNumber: string) => {
   const number = cardNumber.replace(/\s+/g, "")
   if (!/^\d+$/.test(number)) {
@@ -28,6 +30,16 @@ const isValidCreditCardNumber = (cardNumber: string) => {
   return total % 10 === 0
 }
 
+const isValidExpiryMonth = (expiryMonth: string) => {
+  const numberValue = parseInt(expiryMonth, 10)
+  return numberValue >= 1 && numberValue <= 12
+}
+
+const isValidExpiryYear = (expiryYear: string) => {
+  const numberValue = parseInt(expiryYear, 10)
+  return numberValue >= currentYear && numberValue <= currentYear + 10
+}
+
 const isValidCvc = (cvc: string) => {
   return /^\d{3,4}$/.test(cvc)
 }
@@ -50,8 +62,8 @@ export const schema = z.discriminatedUnion("selectedPaymentMethod", [
     card: z.object({
       number: z.string().refine(isValidCreditCardNumber, { message: "カード番号が正しくありません" }),
       name: z.string().min(1, { message: "名前を入力してください" }),
-      expiryMonth: z.string(),
-      expiryYear: z.string(),
+      expiryMonth: z.string().refine(isValidExpiryMonth, { message: "選択してください" }),
+      expiryYear: z.string().refine(isValidExpiryYear, { message: "選択してください" }),
       cvc: z.string().refine(isValidCvc, { message: "正しいCVCを入力してください" }),
     }),
     convini: skipConviniSchema,
