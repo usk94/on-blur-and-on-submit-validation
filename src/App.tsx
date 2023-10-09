@@ -12,11 +12,10 @@ const App = () => {
     defaultValues: {
       selectedPaymentMethod: undefined,
       card: {
-        number: "",
-        name: "",
-        expiryYear: "",
-        expiryMonth: "",
-        cvc: "",
+        number: undefined,
+        name: undefined,
+        expiry: { year: undefined, month: undefined },
+        cvc: undefined,
       },
       convini: {
         conviniName: undefined,
