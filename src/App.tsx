@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Card } from "./Card"
 import { Convini } from "./Convini"
 import { Bank } from "./Bank"
+import { ErrorMessage } from "@hookform/error-message"
 
 const paymentMethods = ["card", "convini", "bank"] as const
 
@@ -37,6 +38,11 @@ const App = () => {
         className="flex flex-col w-screen h-screen justify-center items-center"
       >
         <p className="text-xl font-semibold">支払い方法</p>
+        <ErrorMessage
+          errors={formMethods.formState.errors}
+          name="selectedPaymentMethod"
+          render={() => <p className="text-red-500 text-base">いずれかを選択してください</p>}
+        />
         <div className="mt-2 flex flex-col gap-y-4 w-80">
           {paymentMethods.map((method) => {
             switch (method) {
