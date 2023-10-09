@@ -21,8 +21,8 @@ export const Convini = ({ isActive }: { isActive: boolean }) => {
         <p className="text-sm font-semibold text-black">コンビニ決済</p>
         {isActive && (
           <div className="flex mt-4 items-center">
-            <select {...register("convini.conviniName")} className="border border-gray-300 rounded">
-              <option key="default" value="">
+            <select {...register("convini.conviniName")} defaultValue="" className="border border-gray-300 rounded">
+              <option key="default" value="" disabled>
                 選択してください
               </option>
               {covniniOptions.map((option) => (
