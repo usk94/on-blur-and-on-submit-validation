@@ -1,4 +1,4 @@
-import { useFormContext } from "react-hook-form"
+import { useFormContext, useWatch } from "react-hook-form"
 import { FormType, currentYear } from "./validator"
 import { ErrorMessage } from "@hookform/error-message"
 
@@ -16,7 +16,18 @@ export const Card = ({ isActive }: { isActive: boolean }) => {
   const {
     formState: { errors },
     register,
+    control,
   } = useFormContext<FormType>()
+
+  const year = useWatch({ control: control, name: "card.expiry.year" })
+  const month = useWatch({ control: control, name: "card.expiry.month" })
+
+  let path = ""
+  if (!year) {
+    path = "card.expiry.year"
+  } else if (!month) {
+    path = "card.expiry.month"
+  }
 
   return (
     <label className="flex w-full rounded-lg border py-4 px-4 border-gray-200 gap-y-4">
@@ -27,7 +38,7 @@ export const Card = ({ isActive }: { isActive: boolean }) => {
           <>
             <div className="pb-3 mt-3 border-t border-gray" />
             <div className="flex flex-col gap-y-3">
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col gap-y-1">
                 <p className="text-sm">カード番号</p>
                 <input {...register("card.number")} className="h-8 border border-gray-300 rounded" />
                 <ErrorMessage
@@ -36,7 +47,7 @@ export const Card = ({ isActive }: { isActive: boolean }) => {
                   render={({ message }) => <p className="text-red-500 text-xs">{message}</p>}
                 />
               </div>
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col gap-y-1">
                 <p className="text-sm">氏名</p>
                 <input {...register("card.name")} className="h-8 border border-gray-300 rounded" />
                 <ErrorMessage
@@ -45,16 +56,16 @@ export const Card = ({ isActive }: { isActive: boolean }) => {
                   render={({ message }) => <p className="text-red-500 text-xs">{message}</p>}
                 />
               </div>
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col gap-y-1">
                 <p className="text-sm">有効期限</p>
                 <div className="flex gap-x-2">
                   <select
-                    {...register("card.expiryYear")}
-                    defaultValue="年"
+                    {...register("card.expiry.year")}
+                    defaultValue=""
                     autoComplete="cc-exp-year"
                     className="w-1/2 h-8 border rounded border-gray-300"
                   >
-                    <option key="default" value="">
+                    <option key="default" value="" disabled>
                       年
                     </option>
                     {yearOptions.map((option) => (
@@ -64,12 +75,12 @@ export const Card = ({ isActive }: { isActive: boolean }) => {
                     ))}
                   </select>
                   <select
-                    {...register("card.expiryMonth")}
-                    defaultValue="month"
+                    {...register("card.expiry.month")}
+                    defaultValue=""
                     autoComplete="cc-exp-month"
                     className="w-1/2 h-8 border rounded border-gray-300"
                   >
-                    <option key="default" value="">
+                    <option key="default" value="" disabled>
                       月
                     </option>
                     {monthOptions.map((option) => (
@@ -79,11 +90,13 @@ export const Card = ({ isActive }: { isActive: boolean }) => {
                     ))}
                   </select>
                 </div>
-                {(errors.card?.expiryYear || errors.card?.expiryMonth) && (
-                  <p className="text-red-500 text-xs">{errors.card?.expiryYear?.message}</p>
-                )}
+                <ErrorMessage
+                  errors={errors}
+                  name={path}
+                  render={({ message }) => <p className="text-red-500 text-xs">{message}</p>}
+                />
               </div>
-              <div className="flex flex-col gap-y-2">
+              <div className="flex flex-col gap-y-1">
                 <p className="text-sm">セキュリティコード</p>
                 <input {...register("card.cvc")} className="h-8 border border-gray-300 rounded" />
                 <ErrorMessage
